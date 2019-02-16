@@ -13,3 +13,20 @@ grbinder.BindVerb(group.Group("/login", rlimiter.GinRateLimiter(
   &loginHandler{})
 
 ```
+
+```go
+// Applied to any request method
+limiter := rlimiter.GinRateLimiter(
+  rlimiter.NewRateLimiter(
+    &rlimiter.Rate{Window: 1 * time.Minute, Limit: 10},
+    "api.hardwork"),
+  []string{})
+
+r := gin.Default()
+r.GET("/hardwork", limiter, func(c *gin.Context) {
+})
+r.POST("/hardwork", limiter, func(c *gin.Context) {
+})
+r.PUT("/hardwork", limiter, func(c *gin.Context) {
+})
+```
