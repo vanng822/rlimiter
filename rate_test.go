@@ -2,7 +2,6 @@ package rlimiter
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -64,8 +63,43 @@ func TestGinRateLimiter(t *testing.T) {
 	ginHandleFunc := GinRateLimiter(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", "/", nil)
-	c.Request.RemoteAddr = testIP
-	log.Println(c.ClientIP())
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+	ginHandleFunc(c)
+	assert.True(t, c.IsAborted())
+}
+
+func TestGinRateLimiterNotSameMethod(t *testing.T) {
+	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	limiter := NewRateLimiter(&Rate{
+		Window: 2 * time.Second,
+		Limit:  1,
+	}, testPrefix)
+
+	ginHandleFunc := GinRateLimiter(limiter, []string{"POST"})
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request, _ = http.NewRequest("GET", "/", nil)
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	assert.Equal(t, testIP, c.ClientIP())
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+}
+
+func TestGinRateLimiterAllMethods(t *testing.T) {
+	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	limiter := NewRateLimiter(&Rate{
+		Window: 2 * time.Second,
+		Limit:  1,
+	}, testPrefix)
+
+	ginHandleFunc := GinRateLimiter(limiter, []string{})
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request, _ = http.NewRequest("GET", "/", nil)
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	assert.Equal(t, testIP, c.ClientIP())
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
 	ginHandleFunc(c)
