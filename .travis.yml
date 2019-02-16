@@ -1,7 +1,7 @@
 language: golang
 
 go:
-  - 1.11
+  - tip
 
 env:
   global:
@@ -9,7 +9,9 @@ env:
   - PATH="$HOME/gopath/bin:$HOME/bin:$PATH"
 
 install:
-  - GO111MODULE=on go mod tidy
+  - go get github.com/gin-gonic/gin
+  - go get github.com/go-redis/redis
+  - go get github.com/stretchr/testify/assert
 
 services:
   - redis-server
