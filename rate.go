@@ -2,10 +2,7 @@ package rlimiter
 
 import (
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 // Rate define window as describe in https://redis.io/commands/incr#pattern-rate-limiter-2
@@ -19,11 +16,6 @@ func NewRateLimiter(rate *Rate, prefix string) RateLimiter {
 		rate:   rate,
 		prefix: prefix,
 	}
-}
-
-type RateLimiter interface {
-	IncrementUsage(key string) (bool, error)
-	Key(c *gin.Context) string
 }
 
 type rateLimiter struct {
@@ -42,36 +34,4 @@ func (r *rateLimiter) IncrementUsage(key string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
-}
-
-func (r *rateLimiter) Key(c *gin.Context) string {
-	return c.ClientIP()
-}
-
-func GinRateLimiter(limiter RateLimiter, methods []string) gin.HandlerFunc {
-
-	return func(c *gin.Context) {
-		if len(methods) == 0 || inStrings(c.Request.Method, methods) {
-			key := limiter.Key(c)
-			ok, _ := limiter.IncrementUsage(key)
-			if !ok {
-				c.AbortWithStatusJSON(
-					http.StatusTooManyRequests,
-					gin.H{
-						"status": "error",
-						"error":  http.StatusText(http.StatusTooManyRequests)})
-				return
-			}
-		}
-		c.Next()
-	}
-}
-
-func inStrings(needle string, haystack []string) bool {
-	for _, m := range haystack {
-		if needle == m {
-			return true
-		}
-	}
-	return false
 }

@@ -22,7 +22,7 @@ func TestGinIpRateLimiter(t *testing.T) {
 		Window: 2 * time.Second,
 		Limit:  1,
 	}, testPrefix)
-	ginHandleFunc := GinRateLimiter(limiter, []string{"GET"})
+	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", "/blop", nil)
 	c.Request.Header.Add("X-Forwarded-For", testIP2)
@@ -30,6 +30,58 @@ func TestGinIpRateLimiter(t *testing.T) {
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
 	assert.Equal(t, "1", getRedis(key))
+	ginHandleFunc(c)
+	assert.True(t, c.IsAborted())
+}
+
+func TestGinRateLimiter(t *testing.T) {
+	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	limiter := NewIPRateLimiter(&Rate{
+		Window: 2 * time.Second,
+		Limit:  1,
+	}, testPrefix)
+	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request, _ = http.NewRequest("GET", "/", nil)
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+	ginHandleFunc(c)
+	assert.True(t, c.IsAborted())
+}
+
+func TestGinIPRateLimiterNotSameMethod(t *testing.T) {
+	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	limiter := NewIPRateLimiter(&Rate{
+		Window: 2 * time.Second,
+		Limit:  1,
+	}, testPrefix)
+
+	ginHandleFunc := GinRateLimit(limiter, []string{"POST"})
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request, _ = http.NewRequest("GET", "/", nil)
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	assert.Equal(t, testIP, c.ClientIP())
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
+}
+
+func TestGinIPRateLimiterAllMethods(t *testing.T) {
+	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	limiter := NewIPRateLimiter(&Rate{
+		Window: 2 * time.Second,
+		Limit:  1,
+	}, testPrefix)
+
+	ginHandleFunc := GinRateLimit(limiter, []string{})
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request, _ = http.NewRequest("GET", "/", nil)
+	c.Request.Header.Add("X-Forwarded-For", testIP)
+	assert.Equal(t, testIP, c.ClientIP())
+	ginHandleFunc(c)
+	assert.False(t, c.IsAborted())
 	ginHandleFunc(c)
 	assert.True(t, c.IsAborted())
 }

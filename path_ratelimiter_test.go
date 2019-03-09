@@ -22,7 +22,7 @@ func TestGinPathRateLimiter(t *testing.T) {
 		Window: 2 * time.Second,
 		Limit:  1,
 	}, testPrefix)
-	ginHandleFunc := GinRateLimiter(limiter, []string{"GET"})
+	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", testPath, nil)
 	c.Request.Header.Add("X-Forwarded-For", testIP)
