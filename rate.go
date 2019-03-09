@@ -23,6 +23,7 @@ func NewRateLimiter(rate *Rate, prefix string) RateLimiter {
 
 type RateLimiter interface {
 	IncrementUsage(key string) (bool, error)
+	Key(c *gin.Context) string
 }
 
 type rateLimiter struct {
@@ -43,12 +44,16 @@ func (r *rateLimiter) IncrementUsage(key string) (bool, error) {
 	return true, nil
 }
 
+func (r *rateLimiter) Key(c *gin.Context) string {
+	return c.ClientIP()
+}
+
 func GinRateLimiter(limiter RateLimiter, methods []string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		if len(methods) == 0 || inStrings(c.Request.Method, methods) {
-			ip := c.ClientIP()
-			ok, _ := limiter.IncrementUsage(ip)
+			key := limiter.Key(c)
+			ok, _ := limiter.IncrementUsage(key)
 			if !ok {
 				c.AbortWithStatusJSON(
 					http.StatusTooManyRequests,

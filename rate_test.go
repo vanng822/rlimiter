@@ -20,6 +20,11 @@ func cleanRedisKey(key string) {
 	Client.Del(key)
 }
 
+func getRedis(key string) string {
+	val, _ := Client.Get(key).Result()
+	return val
+}
+
 func TestInStrings(t *testing.T) {
 	assert.True(t, inStrings("POST", []string{"GET", "POST"}))
 	assert.False(t, inStrings("GET", []string{"PUT", "POST"}))
