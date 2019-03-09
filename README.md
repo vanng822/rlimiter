@@ -5,8 +5,8 @@ Simple redis rate limit
 
 ```go
 // applied only to endpoint login and POST
-grbinder.BindVerb(group.Group("/login", rlimiter.GinRateLimiter(
-  rlimiter.NewRateLimiter(
+grbinder.BindVerb(group.Group("/login", rlimiter.GinRateLimit(
+  rlimiter.NewIPRateLimiter(
     &rlimiter.Rate{Window: 10 * time.Second, Limit: 10},
     "api.login"),
   []string{"POST"})),
@@ -16,8 +16,8 @@ grbinder.BindVerb(group.Group("/login", rlimiter.GinRateLimiter(
 
 ```go
 // Applied to any request method
-limiter := rlimiter.GinRateLimiter(
-  rlimiter.NewRateLimiter(
+limiter := rlimiter.GinRateLimit(
+  rlimiter.NewIPRateLimiter(
     &rlimiter.Rate{Window: 1 * time.Minute, Limit: 10},
     "api.hardwork"),
   []string{})
