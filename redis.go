@@ -10,7 +10,7 @@ var (
 			redis.call("expire", KEYS[1], ARGV[1])
 		end
 		return current
-  `)
+	`)
 	// Client for connecting to redis database
 	Client = redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
