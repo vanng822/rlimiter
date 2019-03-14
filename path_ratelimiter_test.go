@@ -25,11 +25,11 @@ func TestGinPathRateLimiter(t *testing.T) {
 	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", testPath, nil)
-	c.Request.Header.Add("X-Forwarded-For", testIP)
 	assert.Equal(t, "", getRedis(key))
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
 	assert.Equal(t, "1", getRedis(key))
 	ginHandleFunc(c)
 	assert.True(t, c.IsAborted())
+	assert.Equal(t, "2", getRedis(key))
 }

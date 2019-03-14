@@ -32,6 +32,7 @@ func TestGinIpRateLimiter(t *testing.T) {
 	assert.Equal(t, "1", getRedis(key))
 	ginHandleFunc(c)
 	assert.True(t, c.IsAborted())
+	assert.Equal(t, "2", getRedis(key))
 }
 
 func TestGinRateLimiter(t *testing.T) {

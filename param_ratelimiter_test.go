@@ -29,11 +29,11 @@ func TestGinParamRateLimiter(t *testing.T) {
 	params := make([]gin.Param, 0)
 	params = append(params, gin.Param{Key: "someparam", Value: testParamValue})
 	c.Params = params
-	c.Request.Header.Add("X-Forwarded-For", testIP)
 	assert.Equal(t, "", getRedis(key))
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
 	assert.Equal(t, "1", getRedis(key))
 	ginHandleFunc(c)
 	assert.True(t, c.IsAborted())
+	assert.Equal(t, "2", getRedis(key))
 }
