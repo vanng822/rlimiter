@@ -1,6 +1,6 @@
 module github.com/vanng822/rlimiter
 
-go 1.22.2
+go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.3.0
