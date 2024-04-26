@@ -1,5 +1,7 @@
 module github.com/vanng822/rlimiter
 
+go 1.22.2
+
 require (
 	github.com/gin-gonic/gin v1.3.0
 	github.com/go-redis/redis v6.15.1+incompatible
@@ -19,7 +21,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ugorji/go/codec v0.0.0-20190204201341-e444a5086c43 // indirect
 	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f // indirect
+	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
