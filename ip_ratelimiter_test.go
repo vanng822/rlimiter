@@ -25,7 +25,7 @@ func TestGinIpRateLimiter(t *testing.T) {
 	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", "/blop", nil)
-	c.Request.Header.Add("X-Forwarded-For", testIP2)
+	c.Request.RemoteAddr = testIP2 + ":1234"
 	assert.Equal(t, "", getRedis(key))
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
@@ -44,7 +44,7 @@ func TestGinRateLimiter(t *testing.T) {
 	ginHandleFunc := GinRateLimit(limiter, []string{"GET"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("GET", "/", nil)
-	c.Request.Header.Add("X-Forwarded-For", testIP)
+	c.Request.RemoteAddr = testIP + ":1234"
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
 	ginHandleFunc(c)
@@ -60,8 +60,10 @@ func TestGinIPRateLimiterNotSameMethod(t *testing.T) {
 
 	ginHandleFunc := GinRateLimit(limiter, []string{"POST"})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
 	c.Request, _ = http.NewRequest("GET", "/", nil)
-	c.Request.Header.Add("X-Forwarded-For", testIP)
+	c.Request.RemoteAddr = testIP + ":1234"
+
 	assert.Equal(t, testIP, c.ClientIP())
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
@@ -78,8 +80,10 @@ func TestGinIPRateLimiterAllMethods(t *testing.T) {
 
 	ginHandleFunc := GinRateLimit(limiter, []string{})
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
 	c.Request, _ = http.NewRequest("GET", "/", nil)
-	c.Request.Header.Add("X-Forwarded-For", testIP)
+	c.Request.RemoteAddr = testIP + ":1234"
+
 	assert.Equal(t, testIP, c.ClientIP())
 	ginHandleFunc(c)
 	assert.False(t, c.IsAborted())
