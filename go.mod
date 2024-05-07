@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/go-redis/redis v6.15.1+incompatible
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/stretchr/testify v1.9.0
 )
 
