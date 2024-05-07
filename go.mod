@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.1+incompatible
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
