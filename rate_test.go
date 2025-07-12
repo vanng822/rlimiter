@@ -1,6 +1,7 @@
 package rlimiter
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -14,11 +15,11 @@ var (
 )
 
 func cleanRedisKey(key string) {
-	Client.Del(key)
+	Client.Del(context.Background(), key)
 }
 
 func getRedis(key string) string {
-	val, _ := Client.Get(key).Result()
+	val, _ := Client.Get(context.Background(), key).Result()
 	return val
 }
 
@@ -48,7 +49,7 @@ func TestRateLimiterError(t *testing.T) {
 		Window: 2 * time.Second,
 		Limit:  1,
 	}, testPrefix)
-	Client.Set(key, "notAnUint64", 2*time.Second)
+	Client.Set(context.Background(), key, "notAnUint64", 2*time.Second)
 	ok, err := limiter.IncrementUsage(testIP)
 	assert.NotNil(t, err)
 	// We should not block if redis is down
