@@ -1,6 +1,7 @@
 package rlimiter
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -25,7 +26,7 @@ type rateLimiter struct {
 
 func (r *rateLimiter) IncrementUsage(key string) (bool, error) {
 	name := fmt.Sprintf("%s:%s", r.prefix, key)
-	cmd := incrementScript.Run(Client, []string{name}, r.rate.Window.Seconds())
+	cmd := incrementScript.Run(context.Background(), Client, []string{name}, r.rate.Window.Seconds())
 	usage, err := cmd.Int64()
 	if err != nil {
 		return true, err
