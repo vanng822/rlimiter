@@ -1,6 +1,10 @@
 package rlimiter
 
-import "github.com/redis/go-redis/v9"
+import (
+	"sync/atomic"
+
+	"github.com/redis/go-redis/v9"
+)
 
 var (
 	incrementScript = redis.NewScript(`
@@ -11,9 +15,25 @@ var (
 		end
 		return current
 	`)
-	// Client for connecting to redis database
-	Client = redis.NewClient(&redis.Options{
+	// client for connecting to redis database
+	client atomic.Pointer[redis.Client]
+)
+
+func init() {
+	// Set default client
+	SetClient(redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 		DB:   0, // use default DB
-	})
-)
+	}))
+}
+
+func SetClient(c *redis.Client) {
+	client.Store(c)
+}
+
+func GetClient() *redis.Client {
+	if c := client.Load(); c != nil {
+		return c
+	}
+	panic("redis client is not initialized")
+}
