@@ -16,7 +16,7 @@ var (
 )
 
 func TestGinIpRateLimiter(t *testing.T) {
-	key := fmt.Sprintf("%s:%s", testPrefix, testIP2)
+	key := fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP2)
 	defer cleanRedisKey(key)
 	limiter := NewIPRateLimiter(&Rate{
 		Window: 2 * time.Second,
@@ -36,7 +36,7 @@ func TestGinIpRateLimiter(t *testing.T) {
 }
 
 func TestGinRateLimiter(t *testing.T) {
-	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	defer cleanRedisKey(fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP))
 	limiter := NewIPRateLimiter(&Rate{
 		Window: 2 * time.Second,
 		Limit:  1,
@@ -52,7 +52,7 @@ func TestGinRateLimiter(t *testing.T) {
 }
 
 func TestGinIPRateLimiterNotSameMethod(t *testing.T) {
-	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	defer cleanRedisKey(fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP))
 	limiter := NewIPRateLimiter(&Rate{
 		Window: 2 * time.Second,
 		Limit:  1,
@@ -72,7 +72,7 @@ func TestGinIPRateLimiterNotSameMethod(t *testing.T) {
 }
 
 func TestGinIPRateLimiterAllMethods(t *testing.T) {
-	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	defer cleanRedisKey(fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP))
 	limiter := NewIPRateLimiter(&Rate{
 		Window: 2 * time.Second,
 		Limit:  1,

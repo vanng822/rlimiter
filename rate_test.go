@@ -29,7 +29,7 @@ func TestInStrings(t *testing.T) {
 }
 
 func TestRateLimiter(t *testing.T) {
-	defer cleanRedisKey(fmt.Sprintf("%s:%s", testPrefix, testIP))
+	defer cleanRedisKey(fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP))
 	limiter := NewRateLimiter(&Rate{
 		Window: 2 * time.Second,
 		Limit:  1,
@@ -43,7 +43,7 @@ func TestRateLimiter(t *testing.T) {
 }
 
 func TestRateLimiterError(t *testing.T) {
-	key := fmt.Sprintf("%s:%s", testPrefix, testIP)
+	key := fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testIP)
 	defer cleanRedisKey(key)
 	limiter := NewRateLimiter(&Rate{
 		Window: 2 * time.Second,

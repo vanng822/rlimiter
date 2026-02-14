@@ -17,7 +17,7 @@ var (
 )
 
 func TestGinParamRateLimiter(t *testing.T) {
-	key := fmt.Sprintf("%s:%s", testPrefix, testParamValue)
+	key := fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testParamValue)
 	defer cleanRedisKey(key)
 	limiter := NewParamRateLimiter(&Rate{
 		Window: 2 * time.Second,

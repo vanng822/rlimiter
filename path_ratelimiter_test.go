@@ -16,7 +16,7 @@ var (
 )
 
 func TestGinPathRateLimiter(t *testing.T) {
-	key := fmt.Sprintf("%s:%s", testPrefix, testPath)
+	key := fmt.Sprintf("%s%s:%s", globalPrefix, testPrefix, testPath)
 	defer cleanRedisKey(key)
 	limiter := NewPathRateLimiter(&Rate{
 		Window: 2 * time.Second,
