@@ -20,7 +20,7 @@ func TestAutoBan_NoIncrement(t *testing.T) {
 	defer cleanRedisKey(autobannedKey)
 
 	r := gin.New()
-	r.Use(AutoBan(&Rate{Limit: 2, Window: time.Minute}, http.StatusTooManyRequests, time.Minute, 404))
+	r.Use(AutoBan())
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusOK) // 200, not in statuses
 	})
@@ -42,7 +42,7 @@ func TestAutoBan_Increment(t *testing.T) {
 	defer cleanRedisKey(autobannedKey)
 
 	r := gin.New()
-	r.Use(AutoBan(&Rate{Limit: 2, Window: time.Minute}, http.StatusTooManyRequests, time.Minute, 404))
+	r.Use(AutoBan())
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusNotFound) // 404, in statuses
 	})
@@ -64,7 +64,7 @@ func TestAutoBan_Ban(t *testing.T) {
 	defer cleanRedisKey(autobannedKey)
 
 	r := gin.New()
-	r.Use(AutoBan(&Rate{Limit: 1, Window: time.Minute}, http.StatusTooManyRequests, time.Minute, 404))
+	r.Use(AutoBan(AutoBanWithRate(&Rate{Limit: 1, Window: time.Minute})))
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 	})
@@ -104,7 +104,7 @@ func TestAutoBan_BannedRequest(t *testing.T) {
 	GetClient().Set(context.Background(), autobannedKey, "1", time.Minute)
 
 	r := gin.New()
-	r.Use(AutoBan(&Rate{Limit: 1, Window: time.Minute}, http.StatusTooManyRequests, time.Minute, 404))
+	r.Use(AutoBan())
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
@@ -125,7 +125,7 @@ func TestAutoBan_Defaults(t *testing.T) {
 	defer cleanRedisKey(autobannedKey)
 
 	r := gin.New()
-	r.Use(AutoBan(nil, 0, time.Minute)) // nil rate, default to 100/min, statuses to 404
+	r.Use(AutoBan()) // nil rate, default to 100/min, statuses to 404
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 	})
