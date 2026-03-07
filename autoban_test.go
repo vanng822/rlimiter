@@ -14,8 +14,8 @@ import (
 
 func TestAutoBan_NoIncrement(t *testing.T) {
 	testIP := "192.168.1.1"
-	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobanPrefix, testIP)
-	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, testIP)
+	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autoban", testIP)
+	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autobanned", testIP)
 	defer cleanRedisKey(autobanKey)
 	defer cleanRedisKey(autobannedKey)
 
@@ -36,8 +36,8 @@ func TestAutoBan_NoIncrement(t *testing.T) {
 
 func TestAutoBan_Increment(t *testing.T) {
 	testIP := "192.168.1.2"
-	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobanPrefix, testIP)
-	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, testIP)
+	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autoban", testIP)
+	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autobanned", testIP)
 	defer cleanRedisKey(autobanKey)
 	defer cleanRedisKey(autobannedKey)
 
@@ -58,8 +58,8 @@ func TestAutoBan_Increment(t *testing.T) {
 
 func TestAutoBan_Ban(t *testing.T) {
 	testIP := "192.168.1.3"
-	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobanPrefix, testIP)
-	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, testIP)
+	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autoban", testIP)
+	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autobanned", testIP)
 	defer cleanRedisKey(autobanKey)
 	defer cleanRedisKey(autobannedKey)
 
@@ -95,8 +95,8 @@ func TestAutoBan_Ban(t *testing.T) {
 
 func TestAutoBan_BannedRequest(t *testing.T) {
 	testIP := "192.168.1.4"
-	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobanPrefix, testIP)
-	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, testIP)
+	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autoban", testIP)
+	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autobanned", testIP)
 	defer cleanRedisKey(autobanKey)
 	defer cleanRedisKey(autobannedKey)
 
@@ -119,8 +119,8 @@ func TestAutoBan_BannedRequest(t *testing.T) {
 
 func TestAutoBan_Defaults(t *testing.T) {
 	testIP := "192.168.1.5"
-	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobanPrefix, testIP)
-	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, testIP)
+	autobanKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autoban", testIP)
+	autobannedKey := fmt.Sprintf("%s%s:%s", globalPrefix, "autobanned", testIP)
 	defer cleanRedisKey(autobanKey)
 	defer cleanRedisKey(autobannedKey)
 

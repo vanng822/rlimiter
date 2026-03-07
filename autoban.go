@@ -11,14 +11,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-var autobanPrefix = "autoban"
-var autobannedPrefix = "autobanned"
-
 type autoBanOption struct {
-	Rate           *Rate
-	ResponseStatus int
-	BanDuration    time.Duration
-	Statuses       []int
+	Rate             *Rate
+	ResponseStatus   int
+	BanDuration      time.Duration
+	Statuses         []int
+	AutobanPrefix    string
+	AutobannedPrefix string
 }
 
 type AutoBanOption func(*autoBanOption)
@@ -51,12 +50,26 @@ func AutoBanWithStatuses(statuses ...int) AutoBanOption {
 	}
 }
 
+func AutoBanWithAutobanPrefix(prefix string) AutoBanOption {
+	return func(o *autoBanOption) {
+		o.AutobanPrefix = prefix
+	}
+}
+
+func AutoBanWithAutobannedPrefix(prefix string) AutoBanOption {
+	return func(o *autoBanOption) {
+		o.AutobannedPrefix = prefix
+	}
+}
+
 func defaultAutoBanOption() *autoBanOption {
 	return &autoBanOption{
-		Rate:           &Rate{Limit: 20, Window: 2 * time.Minute},
-		ResponseStatus: http.StatusTooManyRequests,
-		BanDuration:    30 * time.Minute,
-		Statuses:       []int{http.StatusNotFound},
+		Rate:             &Rate{Limit: 20, Window: 2 * time.Minute},
+		ResponseStatus:   http.StatusTooManyRequests,
+		BanDuration:      30 * time.Minute,
+		Statuses:         []int{http.StatusNotFound},
+		AutobanPrefix:    "autoban",
+		AutobannedPrefix: "autobanned",
 	}
 }
 
@@ -67,14 +80,14 @@ func AutoBan(opts ...AutoBanOption) gin.HandlerFunc {
 		opt(option)
 	}
 
-	rater := NewRateLimiter(option.Rate, autobanPrefix)
+	rater := NewRateLimiter(option.Rate, option.AutobanPrefix)
 
 	if len(option.Statuses) == 0 {
 		option.Statuses = []int{http.StatusNotFound} // Default to 404 Not Found
 	}
 
 	isBanned := func(ip string) (bool, error) {
-		key := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, ip)
+		key := fmt.Sprintf("%s%s:%s", globalPrefix, option.AutobannedPrefix, ip)
 		result, err := GetClient().Get(context.Background(), key).Result()
 		if err == nil && result == "1" {
 			return true, nil
@@ -86,7 +99,7 @@ func AutoBan(opts ...AutoBanOption) gin.HandlerFunc {
 	}
 
 	banIp := func(ip string) {
-		key := fmt.Sprintf("%s%s:%s", globalPrefix, autobannedPrefix, ip)
+		key := fmt.Sprintf("%s%s:%s", globalPrefix, option.AutobannedPrefix, ip)
 		// Set the key with an expiration time of 1 minute
 		err := GetClient().Set(context.Background(), key, "1", option.BanDuration).Err()
 		if err != nil {
