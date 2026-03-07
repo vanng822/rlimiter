@@ -23,6 +23,9 @@ type autoBanOption struct {
 type AutoBanOption func(*autoBanOption)
 
 func AutoBanWithRate(rate *Rate) AutoBanOption {
+	if rate == nil {
+		panic("rate can not be nil")
+	}
 	return func(o *autoBanOption) {
 		o.Rate = rate
 	}
@@ -100,7 +103,6 @@ func AutoBan(opts ...AutoBanOption) gin.HandlerFunc {
 
 	banIp := func(ip string) {
 		key := fmt.Sprintf("%s%s:%s", globalPrefix, option.AutobannedPrefix, ip)
-		// Set the key with an expiration time of 1 minute
 		err := GetClient().Set(context.Background(), key, "1", option.BanDuration).Err()
 		if err != nil {
 			fmt.Printf("Error banning IP %s: %v\n", ip, err)

@@ -125,7 +125,7 @@ func TestAutoBan_Defaults(t *testing.T) {
 	defer cleanRedisKey(autobannedKey)
 
 	r := gin.New()
-	r.Use(AutoBan()) // nil rate, default to 100/min, statuses to 404
+	r.Use(AutoBan())
 	r.GET("/", func(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 	})
